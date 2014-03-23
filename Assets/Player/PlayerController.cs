@@ -51,74 +51,41 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Update () {
-
-		drag = new Vector2 (-this.rigidbody2D.velocity.x, -this.rigidbody2D.velocity.y);
-		this.rigidbody2D.AddForce (dragScale * drag);
-
+		
+		// Check line 182 for code
+		this.addDrag();
+		
+		// Housed at line 187
 		if (Input.GetKeyDown(KeyCode.Space) && onGround) {
-			if (facing) {
-				spriteQueueFR = new Queue<Sprite>(fallingRight);
-			} else {
-				spriteQueueFL = new Queue<Sprite>(fallingLeft);
-			}
-			if (this.rigidbody2D.gravityScale == 0) {
-				this.rigidbody2D.AddForce(new Vector2 (0f, 500f));
-			}
-			else {
-				this.rigidbody2D.AddForce (jump);
-			}
-			//onGround = false;
+			this.jumpM();
 		}
-
+		// Housed at line 202
 		if (Input.GetKey(KeyCode.RightArrow) && onGround) {
-			queueTimerR++;
-			queueTimerL = 0;
-			if (queueTimerR > 2) {
-				Sprite temp = spriteQueueR.Dequeue();		
-				this.gameObject.GetComponent<SpriteRenderer>().sprite = temp;
-				spriteQueueR.Enqueue(temp);
-				queueTimerR = 0;
-			}
-			if (this.rigidbody2D.velocity.x < 12f) {
-				this.rigidbody2D.AddForce (move);
-			}
-			facing = true;
+			this.runRight();
 		}
+		// Housed at line 217
 		if (Input.GetKey(KeyCode.LeftArrow) && onGround) {
-			queueTimerL++;
-			queueTimerR = 0;
-			if (queueTimerL > 2) {
-				Sprite temp = spriteQueueL.Dequeue();		
-				this.gameObject.GetComponent<SpriteRenderer>().sprite = temp;
-				spriteQueueL.Enqueue(temp);
-				queueTimerL = 0;
-			}
-			if (this.rigidbody2D.velocity.x > -12f) {
-				this.rigidbody2D.AddForce (-move);
-			}
-			facing = false;
+			this.runLeft();
 		}
-
+		// Housed at line 232
 		if (Input.GetKey(KeyCode.RightArrow) && !onGround) {
-			if (this.rigidbody2D.velocity.x < 15f) {
-				this.rigidbody2D.AddForce (moveInAir);
-			}
+			this.fallRight();
 		}
+		// Housed at line 238
 		if (Input.GetKey(KeyCode.LeftArrow) && !onGround) {
-			if (this.rigidbody2D.velocity.x > -15f) {
-				this.rigidbody2D.AddForce (-moveInAir);
-			}
+			this.fallLeft();
 		}
-
+		// Housed at line 244
 		if (Input.GetKeyUp(KeyCode.RightArrow) && onGround) {
-			facing = true;
-			this.gameObject.GetComponent<SpriteRenderer>().sprite = right;
+			this.faceRight();
 		}
+		// Housed at line 249
 		if (Input.GetKeyUp(KeyCode.LeftArrow) && onGround) {
-			facing = false;
-			this.gameObject.GetComponent<SpriteRenderer>().sprite = left;
+			this.faceLeft();
 		}
 // THIS IS THE FALLING ANIMATION JUST SO YOU KNOOOOOOWWWWWWW
+// And I don't even want to try to make this into a helper method of some kind...
+// TO DO: PLEASE FIGURE OUT HOW TO MAKE ANIMATIONS WORK IN UNITY. NOT VIA MY SILLIES.
 		if (!onGround && !ladder.GetComponent<LadderScript>().onLadder) {
 			if (facing) {
 				if (this.rigidbody2D.velocity.y > 0) {
@@ -209,15 +176,90 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		
+		this.checkOnGround();
+	}
+	
+	private void addDrag() {
+		drag = new Vector2 (-this.rigidbody2D.velocity.x, -this.rigidbody2D.velocity.y);
+		this.rigidbody2D.AddForce (dragScale * drag);
+	}
+	
+	private void jumpM() {
+		if (facing) {
+			spriteQueueFR = new Queue<Sprite>(fallingRight);
+		} else {
+			spriteQueueFL = new Queue<Sprite>(fallingLeft);
+		}
+		if (this.rigidbody2D.gravityScale == 0) {
+			this.rigidbody2D.AddForce(new Vector2 (0f, 500f));
+		}
+		else {
+			this.rigidbody2D.AddForce (jump);
+		}
+		//onGround = false;
+	}
+	
+	private void runRight() {
+		queueTimerR++;
+		queueTimerL = 0;
+		if (queueTimerR > 2) {
+			Sprite temp = spriteQueueR.Dequeue();		
+			this.gameObject.GetComponent<SpriteRenderer>().sprite = temp;
+			spriteQueueR.Enqueue(temp);
+			queueTimerR = 0;
+		}
+		if (this.rigidbody2D.velocity.x < 12f) {
+			this.rigidbody2D.AddForce (move);
+		}
+		facing = true;
+	}
+	
+	private void runLeft() {
+		queueTimerL++;
+		queueTimerR = 0;
+		if (queueTimerL > 2) {
+			Sprite temp = spriteQueueL.Dequeue();		
+			this.gameObject.GetComponent<SpriteRenderer>().sprite = temp;
+			spriteQueueL.Enqueue(temp);
+			queueTimerL = 0;
+		}
+		if (this.rigidbody2D.velocity.x > -12f) {
+			this.rigidbody2D.AddForce (-move);
+		}
+		facing = false;
+	}
+	
+	private void fallRight() {
+		if (this.rigidbody2D.velocity.x < 15f) {
+			this.rigidbody2D.AddForce (moveInAir);
+		}
+	}
+	
+	private void fallLeft() {
+		if (this.rigidbody2D.velocity.x > -15f) {
+			this.rigidbody2D.AddForce (-moveInAir);
+		}
+	}
+	
+	private void faceRight() {
+		facing = true;
+		this.gameObject.GetComponent<SpriteRenderer>().sprite = right;
+	}
+	
+	private void faceLeft() {
+		facing = false;
+		this.gameObject.GetComponent<SpriteRenderer>().sprite = left;
+	}
+	
+	private void checkOnGround() {
 		prev = now;
 		now = this.rigidbody2D.velocity.y;
 		
-		if ((prev == 0f) && (now == 0f)) {
-			this.onGround = true;}
-		else {
-			this.onGround = false;}
+		if ((prev == 0f) && (now == 0f)) 
+			this.onGround = true;
+		else
+			this.onGround = false;
 	}
-
 
 	public Vector2 getPrevNow() {
 		return new Vector2(prev, now);
