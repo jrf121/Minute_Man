@@ -7,7 +7,6 @@ public class ImGoingForIt : MonoBehaviour {
 	public float inAirMovementReductionFactor;
 	public float jumpSpeed;
 	
-	private float timeParameter = 0;
 	private bool onGround;
 
 
@@ -28,12 +27,12 @@ public class ImGoingForIt : MonoBehaviour {
 		animator.SetInteger("yVelocity", yDir);
 		animator.SetBool ("onGround", onGround);
 		if (onGround)
-			this.rigidbody2D.velocity = FindVelocity(speedCap, movementAcceleration);
+			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal"), 0f));
 		else
-			this.rigidbody2D.velocity = FindVelocity(speedCap/inAirMovementReductionFactor, movementAcceleration/inAirMovementReductionFactor);
-	}	
+			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal"), 0f));
+	}
 	
-	Vector2 FindVelocity(float movementSpeedCap, float acceleration){
+	/*Vector2 FindVelocity(float movementSpeedCap, float acceleration){
 		if (Input.GetButtonDown("Jump") && onGround){
 			this.rigidbody2D.velocity += new Vector2 (0f, jumpSpeed);
 		}
@@ -51,16 +50,16 @@ public class ImGoingForIt : MonoBehaviour {
 		}
 		return new Vector2(movementSpeedCap * (1 / (1+Mathf.Exp(-timeParameter)) - .5f), this.rigidbody2D.velocity.y);
 		
-	}
+	}*/
 	
 	bool isOnGround(){
 		BoxCollider2D collider = this.GetComponent<BoxCollider2D>();
 		Vector2 leftFoot = (Vector2)this.transform.position + collider.center - collider.size/2f;
 		Vector2 rightFoot = (Vector2)this.transform.position + collider.center + new Vector2 (collider.size.x, -collider.size.y)/2f;
-		RaycastHit2D hitLeft = Physics2D.Raycast(leftFoot, Vector3.down, .05f) ;
-		RaycastHit2D hitRight = Physics2D.Raycast(rightFoot, Vector3.down, .05f);
+		RaycastHit2D hitLeft = Physics2D.Raycast(leftFoot, Vector3.down) ;
+		RaycastHit2D hitRight = Physics2D.Raycast(rightFoot, Vector3.down);
 		
-		if (hitLeft.collider != null || hitRight.collider != null)
+		if (hitLeft.collider != null && (hitLeft.point - leftFoot).magnitude <= 0.5f || hitRight.collider != null && (hitRight.point - rightFoot).magnitude <= 0.5f)
 			return true;
 
 		return false;	
