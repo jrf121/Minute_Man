@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class BouncyFloorScript : MonoBehaviour {
+	public float bounciness;
 
 	private GameObject man;
 	
@@ -11,7 +12,7 @@ public class BouncyFloorScript : MonoBehaviour {
 	
 	void OnCollisionEnter2D () {
 		if (man.transform.position.y > this.transform.position.y) {
-			man.rigidbody2D.AddForce (new Vector2(0f, 1600f));
+			man.rigidbody2D.AddForce (new Vector2(0f, bounciness));
 		}
 	}
 }

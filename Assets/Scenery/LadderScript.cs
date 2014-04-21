@@ -10,7 +10,7 @@ public class LadderScript : MonoBehaviour {
 	public Queue<Sprite> spriteQueue;
 	public int queueTimer;
 
-	void Start () {
+/*	void Start () {
 		spriteQueue = new Queue<Sprite>(climbing);
 		queueTimer = 0;
 	}
@@ -61,5 +61,5 @@ public class LadderScript : MonoBehaviour {
 		else if (onLadder) {
 			player.GetComponent<PlayerController>().onGround = true;
 		}
-	}
+	}*/
 }

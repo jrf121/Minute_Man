@@ -35,7 +35,7 @@ public class PlatformScript : MonoBehaviour {
 
 		if (Input.GetKey(KeyCode.DownArrow) && !this.collider2D.isTrigger && touching) {
 			this.collider2D.isTrigger = true;
-			player.GetComponent<PlayerController>().onGround = false;
+			//player.GetComponent<PlayerController>().onGround = false;
 			player.transform.Translate(0f, -.5f, 0f);
 			touching = false;
 		}

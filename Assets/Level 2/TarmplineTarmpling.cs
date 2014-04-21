@@ -22,10 +22,10 @@ public class TarmplineTarmpling : MonoBehaviour {
 			man.transform.parent = null;
 		}
 		
-		if (man.GetComponent<PlayerController>().getPrevNow ().x >= 0 && man.GetComponent<PlayerController>().getPrevNow ().y <= 0){
+		if (man.GetComponent<PlayerControllerOld>().getPrevNow ().x >= 0 && man.GetComponent<PlayerControllerOld>().getPrevNow ().y <= 0){
 				apex = man.transform.localPosition.y;
 			}
-		if (man.GetComponent<PlayerController>().onGround){
+		if (man.GetComponent<PlayerControllerOld>().onGround){
 			apex = man.transform.localPosition.y;
 		}
 	}
