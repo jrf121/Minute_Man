@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
 	private bool onGround;
 	private bool onLadder = false;
 	private float gravityScale;
+	private int inAirDirection;
 
 
 	// Use this for initialization
@@ -28,39 +29,60 @@ public class PlayerController : MonoBehaviour {
 	
 	
 	void Update(){
-		if (validLadder.Count > 0 && Input.GetAxis("Vertical") != 0){
+	
+		//Ladder climbing junk yeahhhhh
+		if (validLadder.Count > 0 && Input.GetButtonDown("Vertical") && !onLadder){
 			onLadder = true;
 			this.rigidbody2D.velocity = Vector2.zero;
 			this.rigidbody2D.gravityScale = 0f;
-			this.transform.position = new Vector3(validLadder[validLadder.Count-1].transform.position.x, this.transform.position.y, this.transform.position.z);
+			animator.SetTrigger("onLadder");
 		}
+		
 		if (onLadder){
-
-			this.transform.position += new Vector3(0f, Input.GetAxis("Vertical") * climbSpeed, 0f);
+			if (validLadder.Count > 0)
+				this.transform.position = new Vector3(	validLadder[validLadder.Count-1].transform.position.x, 
+			                                     		this.transform.position.y + Input.GetAxis("Vertical") * climbSpeed, 
+			                                      		this.transform.position.z);
+			if (animator.GetCurrentAnimatorStateInfo(0).IsName("Climbing"))
+				animator.speed = Mathf.Abs(Input.GetAxis("Vertical")) * climbSpeed * 10f;
 			if (Input.GetAxis("Horizontal") != 0 || Input.GetButtonDown("Jump") || validLadder.Count == 0){
 				onLadder = false;
 				this.rigidbody2D.gravityScale = gravityScale;
+				animator.SetTrigger("offLadder");
+				animator.speed = 1;
 				if (Input.GetButtonDown("Jump"))
 					this.rigidbody2D.velocity += new Vector2 (0f, jumpSpeed);
 			}
 		}
 		
 		onGround = isOnGround();
+		if (!onGround)
+			inAirDirection = (int)Mathf.Sign(this.rigidbody2D.velocity.x); 
 		
-		int xDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.x) <= 0.1 ? 0f : 2f*this.rigidbody2D.velocity.x/Mathf.Abs(this.rigidbody2D.velocity.x));
-		int yDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.y) <= 0.1 ? 0f : 2f*this.rigidbody2D.velocity.y/Mathf.Abs(this.rigidbody2D.velocity.y));
+		//These ints be used by the anamation controller for junk
+		int xDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.x) <= 0.1 ? 0f : Mathf.Sign (this.rigidbody2D.velocity.x));
+		int yDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.y) <= 0.1 ? 0f : Mathf.Sign (this.rigidbody2D.velocity.y));
+		
+		//There goes that junk to the anamation controller
 		animator.SetInteger("xVelocity", xDir);
 		animator.SetInteger("yVelocity", yDir);
 		animator.SetBool ("onGround", onGround);
-		animator.SetBool ("onLadder", onLadder);
-		if (onGround)
+		
+		//Makes Minute Man walk
+		if (onGround || Input.GetAxis("Horizontal") == inAirDirection)
 			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal"), 0f));
+			
+		//He moves slower in the air
 		else
 			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal")/inAirMovementReductionFactor, 0f));
+		
+		//He slides to a hault much faster than he otherwise would because of this
 		if (Input.GetAxis("Horizontal") == 0)
 			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * 1/slidiness * drag * Mathf.Pow (this.rigidbody2D.velocity.x, 2f), 0f));
 		else
 			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * drag * Mathf.Pow (this.rigidbody2D.velocity.x, 2f), 0f));
+		
+		//Lez jump
 		if (Input.GetButtonDown("Jump") && onGround){
 			this.rigidbody2D.velocity += new Vector2 (0f, jumpSpeed);
 		}
