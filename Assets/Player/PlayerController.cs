@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		
+		
 		onGround = isOnGround();
 		if (!onGround)
 			inAirDirection = (int)Mathf.Sign(this.rigidbody2D.velocity.x); 
@@ -87,7 +88,6 @@ public class PlayerController : MonoBehaviour {
 			this.rigidbody2D.velocity += new Vector2 (0f, jumpSpeed);
 		}
 	}
-	
 	
 	
 	bool isOnGround(){
