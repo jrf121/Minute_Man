@@ -95,8 +95,8 @@ public class TetrisController : MonoBehaviour {
 					for(int i = 0; i < playField.GetLength(0); i++){
 						if(playField[i, j] != null){
 							playField[i, j].transform.position = bottomRightCorner + 
-								new Vector2((i + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.x, 
-								            (j + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.y);
+								new Vector2((i + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.x * playField[i, j].transform.localScale.x, 
+								            (j + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.y * playField[i, j].transform.localScale.y);
 						}
 					}
 				}
@@ -124,7 +124,7 @@ public class TetrisController : MonoBehaviour {
 					lowRow = -2;
 					highRow = 2;
 					lowCol = -2;
-					highCol = +2;
+					highCol = 2;
 					
 					pivotLocation = new Vector2(i, j);
 					//Forces the rotation array to only
@@ -146,7 +146,7 @@ public class TetrisController : MonoBehaviour {
 		
 		for(int j = 2 + lowCol; j <= 2 + highCol; j++){
 			for (int i = 2 + lowRow; i <= 2 + highRow; i++){
-				toRotate[i, j] = playField[(int)pivotLocation.x + lowRow + i, (int)pivotLocation.y + lowCol + j];
+				toRotate[i, j] = playField[(int)pivotLocation.x - 2 + i, (int)pivotLocation.y - 2 + j];
 				if (toRotate[i, j] == null){
 					toRotate[i, j] = new GameObject();
 					toRotate[i, j].name = "Remove";
@@ -170,14 +170,14 @@ public class TetrisController : MonoBehaviour {
 		for(int j = 2 + lowCol; j <= 2 + highCol; j++){
 			for (int i = 2 + lowRow; i <= 2 + highRow; i++){
 				if (goodForRotate == 4){
-					if (activePieces.Contains(playField[(int)pivotLocation.x + lowRow + i, (int)pivotLocation.y + lowCol + j])){
-						playField[(int)pivotLocation.x + lowRow + i, (int)pivotLocation.y + lowCol + j] = null;
+					if (activePieces.Contains(playField[(int)pivotLocation.x - 2 + i, (int)pivotLocation.y - 2 + j])){
+						playField[(int)pivotLocation.x - 2 + i, (int)pivotLocation.y - 2 + j] = null;
 					}
 					if (activePieces.Contains(rotated[i, j])){
-						playField[(int)pivotLocation.x + i + lowRow,(int)pivotLocation.y + j + lowCol] = rotated[i, j];
-						playField[(int)pivotLocation.x + i + lowRow,(int)pivotLocation.y + j + lowCol].transform.position = bottomRightCorner + 
-							new Vector2((pivotLocation.x + i + lowRow + 0.5f) * playField[(int)pivotLocation.x + i + lowRow, (int)pivotLocation.y + j + lowCol].GetComponent<BoxCollider2D>().size.x, 
-							            (pivotLocation.y + j + lowCol + 0.5f) * playField[(int)pivotLocation.x + i + lowRow, (int)pivotLocation.y + j + lowCol].GetComponent<BoxCollider2D>().size.y);
+						playField[(int)pivotLocation.x + i - 2,(int)pivotLocation.y + j - 2] = rotated[i, j];
+						playField[(int)pivotLocation.x + i - 2,(int)pivotLocation.y + j - 2].transform.position = bottomRightCorner + 
+							new Vector2((pivotLocation.x + i - 2 + 0.5f) * playField[(int)pivotLocation.x + i - 2, (int)pivotLocation.y + j - 2].GetComponent<BoxCollider2D>().size.x * playField[(int)pivotLocation.x + i - 2, (int)pivotLocation.y + j - 2].transform.localScale.x, 
+							            (pivotLocation.y + j - 2 + 0.5f) * playField[(int)pivotLocation.x + i - 2, (int)pivotLocation.y + j - 2].GetComponent<BoxCollider2D>().size.y * playField[(int)pivotLocation.x + i - 2, (int)pivotLocation.y + j - 2].transform.localScale.y);
 					}
 				}
 			}
@@ -226,8 +226,8 @@ public class TetrisController : MonoBehaviour {
 						playField[i, n] = playField[i, n + 1];
 						if(playField[i, n] != null){
 							playField[i, n].transform.position = bottomRightCorner + 
-								new Vector2((i + 0.5f) * playField[i, n].GetComponent<BoxCollider2D>().size.x, 
-								            (n + 0.5f) * playField[i, n].GetComponent<BoxCollider2D>().size.y);
+								new Vector2((i + 0.5f) * playField[i, n].GetComponent<BoxCollider2D>().size.x * playField[i, n].transform.localScale.x, 
+								            (n + 0.5f) * playField[i, n].GetComponent<BoxCollider2D>().size.y * playField[i, n].transform.localScale.y);
 						}
 					}
 				}
@@ -265,8 +265,8 @@ public class TetrisController : MonoBehaviour {
 			for(int i = 0; i < playField.GetLength(0); i++){
 				if(playField[i, j] != null){
 					playField[i, j].transform.position = bottomRightCorner + 
-						new Vector2((i + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.x, 
-						            (j + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.y);
+						new Vector2((i + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.x * playField[i, j].transform.localScale.x, 
+						            (j + 0.5f) * playField[i, j].GetComponent<BoxCollider2D>().size.y * playField[i, j].transform.localScale.y);
 				}
 				if (activePieces.Contains(playField[i, j]) && (j == 0 || (playField[i, j - 1] != null && !activePieces.Contains(playField[i, j - 1])))){
 					if (j != 0)

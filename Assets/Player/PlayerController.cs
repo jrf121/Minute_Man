@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public float drag;
 	public float slidiness;
 	public float slideAngle;
+	public float animationSpeed;
 	public List<GameObject> validLadder;
 	
 	private Animator animator;
@@ -29,7 +30,9 @@ public class PlayerController : MonoBehaviour {
 	
 	
 	void Update(){
-	
+		
+		Debug.Log(animator.speed);
+		
 		//Ladder climbing junk yeahhhhh
 		if (validLadder.Count > 0 && Input.GetButtonDown("Vertical") && !onLadder){
 			onLadder = true;
@@ -57,12 +60,19 @@ public class PlayerController : MonoBehaviour {
 		
 		
 		onGround = isOnGround();
-		if (!onGround)
-			inAirDirection = (int)Mathf.Sign(this.rigidbody2D.velocity.x); 
+		if (!onGround){
+			inAirDirection = (int)Input.GetAxis("Horizontal");
+		}
 		
 		//These ints be used by the anamation controller for junk
-		int xDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.x) <= 0.1 ? 0f : Mathf.Sign (this.rigidbody2D.velocity.x));
+		int xDir = (int) Input.GetAxis("Horizontal");
 		int yDir = (int)(Mathf.Abs(this.rigidbody2D.velocity.y) <= 0.1 ? 0f : Mathf.Sign (this.rigidbody2D.velocity.y));
+		if (animator.GetCurrentAnimatorStateInfo(0).IsName("Running Right") || animator.GetCurrentAnimatorStateInfo(0).IsName("Running Left")){
+			animator.speed = 0.25f +  animationSpeed * Mathf.Abs(this.rigidbody2D.velocity.x);
+		}
+		else if(!animator.GetCurrentAnimatorStateInfo(0).IsName("Climbing")){
+			animator.speed = 1f;
+		}
 		
 		//There goes that junk to the anamation controller
 		animator.SetInteger("xVelocity", xDir);
@@ -70,7 +80,21 @@ public class PlayerController : MonoBehaviour {
 		animator.SetBool ("onGround", onGround);
 		
 		//Makes Minute Man walk
-		if (onGround || Input.GetAxis("Horizontal") == inAirDirection)
+		if (onGround){
+			BoxCollider2D collider = this.GetComponent<BoxCollider2D>();
+			Vector2 leftFoot = (Vector2)this.transform.position + collider.center - collider.size/2f;
+			Vector2 rightFoot = (Vector2)this.transform.position + collider.center + new Vector2 (collider.size.x, -collider.size.y)/2f;
+			Vector2 middle = (leftFoot + rightFoot)/2;
+			RaycastHit2D groundHit = Physics2D.Raycast(middle, Vector3.down);
+			Vector3 normal = groundHit.normal;
+			Vector2 toApply = Vector3.Cross(normal * speedCap * Input.GetAxis("Horizontal"), Vector3.forward);
+			this.rigidbody2D.AddForce(toApply);
+			if (Input.GetButtonDown("Jump")){
+				this.rigidbody2D.velocity += (Vector2)Vector3.up * jumpSpeed;
+			}
+			Debug.DrawLine(this.transform.position, (Vector3)toApply + this.transform.position);
+		}
+		else if (Input.GetAxis("Horizontal") == inAirDirection)
 			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal"), 0f));
 			
 		//He moves slower in the air
@@ -78,15 +102,12 @@ public class PlayerController : MonoBehaviour {
 			this.rigidbody2D.AddForce(new Vector2(speedCap * Input.GetAxis("Horizontal")/inAirMovementReductionFactor, 0f));
 		
 		//He slides to a hault much faster than he otherwise would because of this
-		if (Input.GetAxis("Horizontal") == 0)
-			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * 1/slidiness * drag * Mathf.Pow (this.rigidbody2D.velocity.x, 2f), 0f));
+		if (Input.GetAxis("Horizontal") == 0 && onGround)
+			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * 1/slidiness * drag * Mathf.Abs(this.rigidbody2D.velocity.x), 0f));
 		else
-			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * drag * Mathf.Pow (this.rigidbody2D.velocity.x, 2f), 0f));
+			this.rigidbody2D.AddForce(new Vector2(-this.rigidbody2D.velocity.normalized.x * drag * Mathf.Abs (this.rigidbody2D.velocity.x), 0f));
 		
-		//Lez jump
-		if (Input.GetButtonDown("Jump") && onGround){
-			this.rigidbody2D.velocity += new Vector2 (0f, jumpSpeed);
-		}
+		
 	}
 	
 	
